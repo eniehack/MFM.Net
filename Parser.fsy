@@ -1,0 +1,42 @@
+%{
+type MFMTree =
+        | Root of MFMTree
+        | Bold of string * MFMTree
+        | Text of string * string
+
+let makeRootTree (tree: MFMTree) : MFMTree =
+    Root (tree)
+
+let makeTextTree (text:string) (isRoot:bool) : MFMTree =
+    if isRoot
+    then makeRootTree (Text ("text", text))
+    else Text ("text", text)
+
+let makeBoldTree (text: MFMTree) (isRoot: bool) : MFMTree =
+    //let textTree = makeTextTree text false
+    if isRoot
+    then makeRootTree (Bold ("bold", text))
+    else Bold ("bold", text)
+%}
+
+%start start
+
+%token <string> TEXT
+%token BOLD
+%token EOF
+
+%left TEXT
+%left BOLD
+
+%type < MFMTree > start
+
+%%
+
+start: Body EOF { $1 }
+
+Root: Root { makeRootTree $1 }
+
+Body: TEXT { makeTextTree $1 false }
+    | BOLD Body BOLD { makeBoldTree $2 true }
+
+%%

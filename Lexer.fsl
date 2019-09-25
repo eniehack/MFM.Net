@@ -1,0 +1,24 @@
+{
+
+open FSharp.Text.Lexing
+
+let newline (lexbuf: LexBuffer<_>) = 
+  lexbuf.StartPos <- lexbuf.StartPos.NextLine
+
+}
+
+let bold = "**"
+let whitespace = [' ' '\t' ]
+let newline = ('\n' | '\r' '\n' | "  ")
+
+rule tokenize = parse
+| bold { Parser.BOLD }
+| '"' { Parser.TEXT (readString "" lexbuf + "\x00") }
+| whitespace { tokenize lexbuf }
+| newline { newline lexbuf; tokenize lexbuf }
+| _ { failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
+| eof { Parser.EOF } 
+
+and readString str = parse
+| '"' { str }
+| eof | '\n' { failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }

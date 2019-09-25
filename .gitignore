@@ -15,3 +15,8 @@ bin
 !.paket/paket.bootstrapper.exe
 
 # End of https://www.gitignore.io/api/fsharp
+
+Parser.fs
+Parser.fsi
+Parser.fsyacc.output
+Lexer.fs
